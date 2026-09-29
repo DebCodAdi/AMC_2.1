@@ -1,0 +1,148 @@
+# configs/taxonomy.yaml - Single source of truth for Signal 9 AMC
+version: 1
+
+l1:
+  - ANALOG_AM
+  - ANALOG_FM
+  - LINEAR_DIGITAL
+  - FSK_CPM
+  - MULTICARRIER
+  - CHIRP_SPREAD
+  - PULSED_ONOFF
+  - INTERFERENCE
+  - NOISE
+
+l2:
+  AM_DSB_FC: ANALOG_AM
+  AM_DSB_SC: ANALOG_AM
+  SSB_USB: ANALOG_AM
+  SSB_LSB: ANALOG_AM
+  NBFM: ANALOG_FM
+  WBFM: ANALOG_FM
+  CW_OOK: PULSED_ONOFF
+  BPSK: LINEAR_DIGITAL
+  QPSK: LINEAR_DIGITAL
+  PI4_DQPSK: LINEAR_DIGITAL
+  8PSK: LINEAR_DIGITAL
+  16QAM: LINEAR_DIGITAL
+  2FSK: FSK_CPM
+  4FSK: FSK_CPM
+  8FSK: FSK_CPM
+  MFSK_HI: FSK_CPM
+  GMSK: FSK_CPM
+  GFSK: FSK_CPM
+  MSK: FSK_CPM
+  OFDM: MULTICARRIER
+  CSS_CHIRP: CHIRP_SPREAD
+  LO_LEAKAGE: INTERFERENCE
+  SPUR: INTERFERENCE
+  BROADBAND_NOISE: NOISE
+
+l3:
+  FT8:
+    l2: 8FSK
+    bands: [HF, VHF]
+    decoder: jt9_ft8
+  WSPR:
+    l2: 4FSK
+    bands: [HF]
+    decoder: wsprd
+  PSK31:
+    l2: BPSK
+    bands: [HF]
+    decoder: fldigi
+  RTTY_45_170:
+    l2: 2FSK
+    bands: [HF]
+    decoder: fldigi
+  CW_MORSE:
+    l2: CW_OOK
+    bands: [HF, VHF]
+    decoder: null
+  AM_BROADCAST:
+    l2: AM_DSB_FC
+    bands: [HF]
+    decoder: schedule_eibi
+  SSB_VOICE:
+    l2: [SSB_USB, SSB_LSB]
+    bands: [HF]
+    decoder: null
+  DRM:
+    l2: OFDM
+    bands: [HF]
+    decoder: dream
+  HFDL:
+    l2: 8PSK
+    bands: [HF]
+    decoder: dumphfdl
+  FM_BROADCAST:
+    l2: WBFM
+    bands: [VHF]
+    decoder: rds
+  APRS_AFSK1200:
+    l2: NBFM
+    bands: [VHF]
+    decoder: direwolf_atest
+  POCSAG:
+    l2: 2FSK
+    bands: [VHF, UHF]
+    decoder: multimon_ng
+  DMR:
+    l2: 4FSK
+    bands: [VHF, UHF]
+    decoder: dsd_fme
+  P25_P1:
+    l2: 4FSK
+    bands: [VHF, UHF]
+    decoder: dsd_fme
+  AIS:
+    l2: GMSK
+    bands: [VHF]
+    decoder: ais_catcher
+  ACARS:
+    l2: AM_DSB_FC
+    bands: [VHF]
+    decoder: acarsdec
+  LORA:
+    l2: CSS_CHIRP
+    bands: [UHF]
+    decoder: gr_lora
+  ISM_OOK_REMOTE:
+    l2: CW_OOK
+    bands: [UHF]
+    decoder: rtl_433
+  ADSB_1090:
+    l2: CW_OOK
+    bands: [UHF]
+    decoder: dump1090
+
+source_maps:
+  torchsig:
+    ook: [l2, CW_OOK]
+    bpsk: [l2, BPSK]
+    qpsk: [l2, QPSK]
+    8psk: [l2, 8PSK]
+    16qam: [l2, 16QAM]
+    2fsk: [l2, 2FSK]
+    4fsk: [l2, 4FSK]
+    8fsk: [l2, 8FSK]
+    2gfsk: [l2, GFSK]
+    2msk: [l2, MSK]
+    2gmsk: [l2, GMSK]
+    "ofdm-*": [l2, OFDM]
+    "16ask": [l2, UNMAPPED_KEEP]
+  radioml2018:
+    BPSK: [l2, BPSK]
+    QPSK: [l2, QPSK]
+    8PSK: [l2, 8PSK]
+    16QAM: [l2, 16QAM]
+    "AM-SSB-WC": [l2, SSB_USB]
+    "AM-DSB-WC": [l2, AM_DSB_FC]
+    "AM-DSB-SC": [l2, AM_DSB_SC]
+    FM: [l2, WBFM]
+    GMSK: [l2, GMSK]
+    OOK: [l2, CW_OOK]
+  panoradio18:
+    morse: [l3, CW_MORSE]
+    usb: [l3, SSB_VOICE]
+    rtty45_170: [l3, RTTY_45_170]

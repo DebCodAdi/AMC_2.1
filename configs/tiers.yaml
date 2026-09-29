@@ -1,0 +1,14 @@
+# configs/tiers.yaml - Zoom rate ladder and channelization tiers
+zoom_rates:
+  - 1000
+  - 4000
+  - 16000
+  - 64000
+  - 256000
+  - 1024000
+
+fill_factor: 0.6
+crop_length: 4096
+min_observation_sec: 0.1
+target_crops_per_track: 4
+overlap_fraction: 0.5

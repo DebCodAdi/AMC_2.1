@@ -1,0 +1,17 @@
+# configs/bands.yaml - Terrestrial RF bands
+bands:
+  HF:
+    freq_min_hz: 3000000
+    freq_max_hz: 30000000
+    description: "High Frequency (3 - 30 MHz)"
+    propagation: "Ionospheric skywave, Watterson fading"
+  VHF:
+    freq_min_hz: 30000000
+    freq_max_hz: 300000000
+    description: "Very High Frequency (30 - 300 MHz)"
+    propagation: "Line-of-sight, terrain diffraction"
+  UHF:
+    freq_min_hz: 300000000
+    freq_max_hz: 3000000000
+    description: "Ultra High Frequency (300 - 3000 MHz)"
+    propagation: "Line-of-sight, urban multipath Rayleigh/Rician"

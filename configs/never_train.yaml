@@ -1,0 +1,18 @@
+# configs/never_train.yaml - Frozen held-out test manifests to prevent data leakage
+version: 1
+held_out_receivers:
+  - "kiwi_heldout_asia_1"
+  - "kiwi_heldout_eu_1"
+  - "rtl_sdr_rx_heldout"
+held_out_dates:
+  - ">=2026-09-01"
+held_out_classes_openset:
+  l2:
+    - 16QAM
+    - MFSK_HI
+  l3:
+    - APRS_AFSK1200
+    - DRM
+    - ACARS
+hash_verification:
+  require_manifest_check: true

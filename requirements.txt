@@ -1,0 +1,36 @@
+# ── Core runtime: analysis pipeline, exploitation chain, CLI ────────────────
+numpy>=1.24
+scipy>=1.10
+pyyaml>=6.0
+torch>=2.0
+matplotlib>=3.7
+
+# ── GUI (python -m signal9.gui) ──────────────────────────────────────────────
+PySide6>=6.5
+pyqtgraph>=0.13
+
+# ── Training ────────────────────────────────────────────────────────────────
+h5py>=3.8            # RadioML 2018.01A HDF5 loader
+
+# ── Acceleration (optional, recommended) ────────────────────────────────────
+numba>=0.58          # Viterbi kernel JIT (~1000x); pure-Python fallback exists
+
+# ── Test suite: differential oracles and property tests ─────────────────────
+pytest>=7
+hypothesis>=6
+galois>=0.3
+reedsolo>=1.7
+scikit-commpy>=0.8
+crcmod>=1.7
+soundfile>=0.12
+soxr>=0.3
+duckdb>=1.0          # corpus provenance/index tests and tools
+cma>=4.0             # adversarial-hunt tests and tools
+
+# ── Optional tooling (only the listed tools import these) ───────────────────
+# datasketch     tools/corpus/dedup.py
+# pandas, plotly tools/waterfall.py, tools/capability_surface.py
+# scikit-learn   Ledoit-Wolf covariance in signal9/features/cumulants.py (fallback exists)
+# streamlit      review_app/app.py
+# ultralytics    signal9/detect/yolo_adapter.py (only with a YOLO weights file)
+# timm           signal9/models/spec_branch.py (optional EfficientNet stem)

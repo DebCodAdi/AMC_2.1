@@ -1,0 +1,387 @@
+{
+  "file": "C:\\Users\\adity\\Downloads\\AMC_1-satvik\\AMC_1-satvik\\NTRO_SIH26147_SignalAnalysis\\demo_capture.cf32",
+  "status": "DEMOD_NO_CRC",
+  "sample_rate_sps": 48000.0,
+  "center_freq_hz": 0.0,
+  "input": {
+    "sample_rate_source": "cli",
+    "center_freq_source": "unknown",
+    "sample_rate_assumed": false,
+    "input_kind": "raw_iq",
+    "sample_format": "cf32"
+  },
+  "health": {
+    "clipping_fraction": 0.0,
+    "iq_impropriety_db": 31.94438934326172,
+    "dc_spike_detected": false
+  },
+  "total_signals_detected": 1,
+  "signals": [
+    {
+      "track_id": 1,
+      "t_start_sec": 0.0,
+      "t_end_sec": 0.2986666666666667,
+      "duration_sec": 0.2986666666666667,
+      "freq_center_relative_hz": 93.75,
+      "freq_center_absolute_hz": 93.75,
+      "bandwidth_hz": 15515.625,
+      "snr_db": 22.414140701293945,
+      "classification": {
+        "l1": {
+          "prediction": "PSK",
+          "confidence": 0.6829056739807129,
+          "decision_state": "DECISION"
+        },
+        "l2": {
+          "prediction": "QPSK",
+          "confidence": 0.6829056739807129,
+          "decision_state": "DECISION",
+          "top3": [
+            [
+              "QPSK",
+              0.6829
+            ],
+            [
+              "8PSK",
+              0.2149
+            ],
+            [
+              "BPSK",
+              0.0179
+            ]
+          ]
+        },
+        "l3": {
+          "prediction": null,
+          "confidence": 0.0,
+          "decision_state": "NOT_TRAINED"
+        },
+        "preprocessing": {
+          "finite_repaired": 0,
+          "impulsive_noise": false,
+          "impulsive_kurtosis": 1.2928478717803955,
+          "impulsive_mitigation_applied": false,
+          "rms_before": 0.4887377619743347,
+          "rms_after": 0.4887377619743347,
+          "dc_preserved": true,
+          "equalization_recommended": false
+        }
+      },
+      "exploitation": {
+        "sample_rate_hz": 48000.0,
+        "sample_rate_source": "cli",
+        "demodulation": {
+          "modulation": "QPSK",
+          "family": "linear",
+          "symbol_rate_hz": 12000.0,
+          "rolloff": 0.273,
+          "rolloff_quality": 0.626,
+          "cfo_hz": 26.247,
+          "sps_used": 4.0,
+          "evm_db": -12.27,
+          "snr_db": 9.77,
+          "n_symbols": 3684,
+          "timing_lock": 1.0,
+          "order_ambiguous": false,
+          "order_runner_up": null,
+          "order_scores": [
+            {
+              "mod": "BPSK",
+              "evm_db": -2.02,
+              "usage": 0.991,
+              "residual_kurtosis": 1.032,
+              "best_phase_rad": 1.5707963267948966,
+              "plausible": false,
+              "rejected_by": "evm"
+            },
+            {
+              "mod": "QPSK",
+              "evm_db": -12.27,
+              "usage": 0.963,
+              "residual_kurtosis": 13.522,
+              "best_phase_rad": 0.0,
+              "plausible": true,
+              "rejected_by": null
+            },
+            {
+              "mod": "8PSK",
+              "evm_db": -12.31,
+              "usage": 0.704,
+              "residual_kurtosis": 13.502,
+              "best_phase_rad": 0.0,
+              "plausible": false,
+              "rejected_by": "usage"
+            },
+            {
+              "mod": "16QAM",
+              "evm_db": -16.97,
+              "usage": 0.562,
+              "residual_kurtosis": 4.151,
+              "best_phase_rad": 4.319689898685965,
+              "plausible": false,
+              "rejected_by": "usage"
+            },
+            {
+              "mod": "64QAM",
+              "evm_db": -19.87,
+              "usage": 0.422,
+              "residual_kurtosis": 1.74,
+              "best_phase_rad": 0.0,
+              "plausible": false,
+              "rejected_by": "usage"
+            }
+          ],
+          "fsk_tones": 3,
+          "fsk_spacing_hz": 3113.6,
+          "transient_symbols_dropped": 64,
+          "fsk": {}
+        },
+        "bit_ambiguity": {
+          "rotation_deg": 0.0,
+          "mirror": false,
+          "line_code": "none",
+          "differential": false,
+          "score": 0.0,
+          "evidence": {},
+          "hypotheses_tried": 24,
+          "beam_width": 8
+        },
+        "scrambler": {
+          "type": "none",
+          "reason": "wire CRC lock"
+        },
+        "interleaver": {
+          "type": "none",
+          "reason": "wire CRC lock"
+        },
+        "fec": {
+          "class": "none",
+          "reason": "wire CRC lock"
+        },
+        "frames": {
+          "status": "OK",
+          "protocol": "AX.25",
+          "schema": "sigx.frames.v1",
+          "crc": {
+            "model": "CRC-16/X-25",
+            "width": 16
+          },
+          "crc_frames_ok": 10,
+          "crc_frames_checked": 10,
+          "chain_validated": true,
+          "ax25_frames": [
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            }
+          ]
+        },
+        "decoded": {
+          "n_bits": 7368,
+          "preview_hex": "b0 03 dc 8a 92 bc ad 32 a4 84 ad 13 1b 23 0b 3b 17 01 32 a0 8a a8 8c 8c a4 8a a8 be 45 54 46 54 56 54 45 49 53 5f 20 a8 29 a3 2f 28 22 2f 93 54 11 94 91 14 11 55 11 14 98 1b f3 5d c7 1b b8 85 f8 45 45 94 54 19 18 19 94 95 84 18 19 1a 1b 00 3d c8 a9 2b ca d3 2a 48 4a d1 31 b2 30 b3 b1 70 13 2a 08 aa 88 c8 ca 48 aa 8b e4 55 44 65 45 65 44 54 95 35 f2 0a 82 9a 32 f2 82 22 f9 35 41 19 49 11 41 15 51 11 49 81 bf 27 46 13 b0 4f 9f 84 54 59 45 41 91 81 99 49 58 41 81 91 a1 b0 03 dc 8a 92 bc ad 32 a4 84 ad 13 1b 23 0b 3b 17 01 32 a0 8a a8 8c 8c a4 8a a8 be 45 54 46 54 56 54 45 49 53 5f 20 a8 29 a3 2f 28 22 2f 93 54 11 94 91 14 11 55 11 14 98 1b f0 05 72 87 05 31 f8 45 45 94 54 19 18 19 94 95 84 18 19 1a 1b 00 3d c8 a9 2b ca d3 2a 48 4a d1 31 b2 30 b3 b1 70 13 2a 08",
+          "preview_text": ".......2.....#.;..2.........ETFTVTEIS_ .)./(\"/.T.....U.....].....EE.T...........=..+..*HJ.1.0..p.*.....H...UDeEeDT.5....2..\".5A.I.A.Q.I..'F..O..TYEA...IXA..........2.....#.;..2.........ETFTVTEIS_ .)./(\"/.T.....U......r..1.EE.T...........=..+..*HJ.1.0..p.*.",
+          "protocol_frames": [
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            },
+            {
+              "destination": "DEST01-0",
+              "source": "SRC001-0",
+              "control": 3,
+              "pid": 240,
+              "payload_hex": "4e 54 52 4f 2d 53 49 48 2d 32 36 31 34 37 3a 20 53 41 54 45 4c 4c 49 54 45 5f 54 45 4c 45 4d 45 54 52 59 5f 50 41 59 4c 4f 41 44 5f 56 41 4c 49 44 41 54 45 44",
+              "payload_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED",
+              "crc_ok": true
+            }
+          ],
+          "frames_crc_ok": 10,
+          "message_text": "NTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED\nNTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED\nNTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED\nNTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED\nNTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED\nNTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED\nNTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED\nNTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED\nNTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED\nNTRO-SIH-26147: SATELLITE_TELEMETRY_PAYLOAD_VALIDATED"
+        },
+        "status": "SUCCESS_CRC_LOCKED",
+        "notes": [
+          "CRC-16/X-25-valid AX.25 detected before blind bit transforms."
+        ]
+      }
+    }
+  ],
+  "fs_est": null,
+  "fs_conf": null,
+  "rs_est": null,
+  "alpha_est": null,
+  "cfo_est": null,
+  "snr_est": null,
+  "evm": null,
+  "n_slips": null,
+  "n_branches_locked": 0,
+  "branch_name": null,
+  "t_stage_ms": {},
+  "t_total_ms": 3235.14,
+  "failure_stage": null,
+  "failure_reason": null,
+  "confidence": null,
+  "plausibility_score": null
+}

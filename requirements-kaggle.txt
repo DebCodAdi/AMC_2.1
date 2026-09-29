@@ -1,0 +1,7 @@
+# Kaggle's GPU image already provides most of these.  This file deliberately
+# excludes the desktop GUI and the optional test/oracle packages.
+numpy>=1.24
+scipy>=1.10
+torch>=2.0
+h5py>=3.8
+pyyaml>=6.0

@@ -1,0 +1,14 @@
+# configs/filename_patterns.yaml - Regex filename inference rules
+patterns:
+  - name: gqrx
+    regex: 'gqrx_\d{8}_\d{6}_(?P<fc>\d+)_(?P<fs>\d+)_fc\.raw$'
+    default_dtype: cf32
+  - name: sdrsharp_iq
+    regex: 'SDRSharp_\d{8}_\d{6}Z_(?P<fc>\d+)Hz_IQ\.wav$'
+    default_dtype: null
+  - name: rtl_sdr
+    regex: '(?P<fc>\d+)_(?P<fs>\d+)(?:sps|Sps)?.*\.(?P<ext>cu8|cs8|cs16|cf32)$'
+    default_dtype: null
+  - name: kiwisdr
+    regex: '(?P<date>\d{8})_(?P<time>\d{6})_(?P<fc>\d+)_iq\.wav$'
+    default_dtype: null

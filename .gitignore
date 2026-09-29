@@ -1,0 +1,150 @@
+# ==============================================================================
+# NTRO SIH 26147 - Signal9 Project .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Python Cache & Compiled Files
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+
+# ------------------------------------------------------------------------------
+# 2. Virtual Environments
+# ------------------------------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.env
+
+# ------------------------------------------------------------------------------
+# 3. Testing, Coverage & Benchmarking
+# ------------------------------------------------------------------------------
+.pytest_cache/
+.hypothesis/
+.benchmarks/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+cover/
+.cache
+
+# ------------------------------------------------------------------------------
+# 4. Scratch & Temporary Files
+# ------------------------------------------------------------------------------
+scratch/
+runs/
+logs/
+*.log
+*.tmp
+*.temp
+
+# ------------------------------------------------------------------------------
+# 5. Jupyter Notebooks & IDEs
+# ------------------------------------------------------------------------------
+.ipynb_checkpoints/
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# ------------------------------------------------------------------------------
+# 6. Packaging, Distribution & PyInstaller
+# ------------------------------------------------------------------------------
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ------------------------------------------------------------------------------
+# 7. Raw RF Signals, Datasets & Large Archives (CRITICAL)
+# ------------------------------------------------------------------------------
+# Prevent accidental commits of multi-gigabyte recordings
+data/
+dataset/
+datasets/
+recordings/
+captures/
+
+# Binary RF stream formats
+*.iq
+*.wav
+*.raw
+*.bin
+*.dat
+*.sigmf-data
+*.sigmf-meta
+
+# SDR raw sample formats (Complex Float 32, Signed Int 16, Unsigned Int 8)
+*.cf32
+*.cs16
+*.cu8
+*.cs8
+*.c64
+
+# Keep specific small test fixtures if needed:
+!demo_capture.cf32
+!test_ntro_qpsk.cf32
+
+# Structured data archives & matrices
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.mat
+*.tar
+*.tar.gz
+*.tar.bz2
+*.zip
+*.7z
+*.rar
+
+# ------------------------------------------------------------------------------
+# 8. Model Checkpoints & Large Neural Network Weights
+# ------------------------------------------------------------------------------
+checkpoints/
+*.onnx
+*.engine
+
+# Keep all models in models/ tracked for team training and inference:
+!models/
+!models/*.ckpt
+!models/*.pt
+!models/*.pth
+
+# ------------------------------------------------------------------------------
+# 9. Duplicate Builds & Backups
+# ------------------------------------------------------------------------------
+patched_verification_build/
