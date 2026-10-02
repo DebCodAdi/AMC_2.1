@@ -39,9 +39,19 @@ def channelize(x: np.ndarray,
     out_fs = pick_rate(bw_hz)
     if out_fs >= fs or (len(seg) * out_fs / fs < 256):
         # Keep capture rate if out_fs >= fs or if downsampling leaves < 256 samples
-        return seg_shifted.astype(np.complex64), int(fs)
+        return _filter_channel(seg_shifted, fs, bw_hz), int(fs)
 
     # 3. Rational resample with bounded denominator
     ratio = Fraction(out_fs, int(round(fs))).limit_denominator(4096)
     y = sps.resample_poly(seg_shifted, ratio.numerator, ratio.denominator)
-    return y.astype(np.complex64), out_fs
+    return _filter_channel(y, out_fs, bw_hz), out_fs
+
+
+def _filter_channel(x: np.ndarray, fs: float, bandwidth: float) -> np.ndarray:
+    """Isolate the detected band even when the zoom tier is much wider."""
+    cutoff = 0.6 * bandwidth
+    if bandwidth <= 0 or cutoff >= 0.48 * fs:
+        return x.astype(np.complex64)
+    taps = min(2049, max(33, int(np.ceil(4 * fs / (0.2 * bandwidth))) | 1))
+    kernel = sps.firwin(taps, cutoff, fs=fs, window=("kaiser", 7.0))
+    return sps.fftconvolve(x, kernel, mode="same").astype(np.complex64)

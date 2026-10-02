@@ -5,7 +5,7 @@ from scipy.optimize import minimize_scalar
 
 def fit_temperature(logits: np.ndarray, labels: np.ndarray) -> float:
     """Fit a single positive temperature scalar T via NLL minimization.
-    Guarantees Expected Calibration Error (ECE) is minimized.
+    Minimizes held-out NLL; ECE must be measured separately.
     """
     n, c = logits.shape
     labels_onehot = np.zeros_like(logits)

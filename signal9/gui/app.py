@@ -238,6 +238,9 @@ class MainWindow(QtWidgets.QMainWindow):
         exp_bits = QtWidgets.QPushButton("Export decoded bits…")
         exp_bits.clicked.connect(self.export_bits)
         row.addWidget(exp_bits)
+        compare_bits = QtWidgets.QPushButton("Compare reference bits…")
+        compare_bits.clicked.connect(self.compare_reference_bits)
+        row.addWidget(compare_bits)
         row.addStretch(1)
         bl.addLayout(row)
         self.tabs.addTab(bits_w, "Bit stream")
@@ -412,7 +415,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.msg_text.setPlainText(dec.get("message_text", ""))
         elif dec.get("preview_text"):
             self.msg_summary.setText("<b>Decoded bytes</b> — no frame structure was identified, "
-                                     "so this is the raw decoded stream (first bytes):")
+                                     "so this is a readability-selected preview, without CRC validation:")
             self.msg_text.setPlainText(dec["preview_text"] + "\n\n" + dec.get("preview_hex", ""))
         else:
             self.msg_summary.setText("No decoded data for this track.")
@@ -463,14 +466,16 @@ class MainWindow(QtWidgets.QMainWindow):
         geo = ", ".join(f"{k}={il[k]}" for k in ("rows", "cols", "slope", "branches", "delay", "size", "phase") if k in il)
         rows = [
             ("Sampling frequency", f"{self.report.get('sample_rate_sps', 0):,.0f} S/s  [{inp.get('sample_rate_source')}]"),
-            ("Track centre offset", f"{sig.get('freq_center_relative_hz', 0):+,.1f} Hz"),
+            ("Carrier offset (total)", _fmt(sig.get("carrier_offset_hz"), " Hz")),
             ("Occupied bandwidth", f"{sig.get('bandwidth_hz', 0):,.1f} Hz"),
             ("Track SNR (detector)", _fmt(sig.get("snr_db"), " dB")),
+            ("Post-filter SNR", _fmt((sig.get("snr_measurement") or {}).get("post_filter_db"), " dB")),
+            ("Modulation decision", str(sig.get("modulation_decision", {}).get("modulation", "UNRESOLVED")) +
+             " [" + str(sig.get("modulation_decision", {}).get("decision_state", "UNKNOWN")) + "]"),
             ("Modulation (measured)", f"{d.get('modulation', '—')}  ({d.get('family', '—')})"),
             ("Modulation (neural)", f"{cls.get('prediction')}  [{cls.get('decision_state')}]"),
             ("Symbol rate", _fmt(d.get("symbol_rate_hz"), " Bd")),
             ("Roll-off", _fmt(d.get("rolloff"), "", 2) if d.get("family") == "linear" else "n/a"),
-            ("Carrier offset", _fmt(d.get("cfo_hz"), " Hz") if d.get("family") == "linear" else "n/a"),
             ("EVM", _fmt(d.get("evm_db"), " dB") if d.get("family") == "linear" else "n/a"),
             ("FSK tones / index h", f"{fsk.get('n_tones')} / {fsk.get('modulation_index')}" if fsk else "n/a"),
             ("Bit mapping", (f"rotation {amb.get('rotation_deg')}°, mirror {amb.get('mirror')}" if "rotation_deg" in amb
@@ -480,6 +485,7 @@ class MainWindow(QtWidgets.QMainWindow):
             ("Interleaving", f"{il.get('type') or 'not run'} {('(' + geo + ')') if geo else ''}"),
             ("FEC", fec_s),
             ("Frame period", _fmt(fr.get("period_bits"), " bits")),
+            ("Byte preview alignment", str((ex.get("decoded") or {}).get("byte_alignment", "n/a"))),
             ("Sync word", f"{(fr.get('sync') or {}).get('length', 0)} bits at {(fr.get('sync') or {}).get('offset', '—')}"),
             ("Payload span (bits)", str((fr.get("payload") or {}).get("bits"))),
             ("Frame CRC", f"{crc.get('model')}  {fr.get('crc_frames_ok')}/{fr.get('crc_frames_checked')} frames" if crc else "none identified"),
@@ -602,6 +608,35 @@ class MainWindow(QtWidgets.QMainWindow):
         if path:
             Path(path).write_text(json.dumps(self.report, indent=2, default=str), encoding="utf-8")
             self.statusBar().showMessage(f"Report saved to {path}")
+
+    def compare_reference_bits(self):
+        from ..dsp.bit_alignment import reference_ber
+        row = self.track_list.currentRow()
+        sigs = self.report.get("signals", [])
+        if row < 0 or row >= len(sigs):
+            return
+        tr = self._track_artifacts(sigs[row]["track_id"])
+        bits = tr.get("decoded_bits") if tr else None
+        if bits is None or len(bits) == 0:
+            QtWidgets.QMessageBox.information(self, "Reference BER", "No decoded bits for this track.")
+            return
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Reference bits (0/1 text)", "", "Text (*.txt)")
+        if not path:
+            return
+        offset, ok = QtWidgets.QInputDialog.getInt(self, "Reference BER", "Offset in decoded bits:", 0, 0, len(bits))
+        if not ok:
+            return
+        try:
+            text = "".join(Path(path).read_text().split())
+            if not text or set(text) - {"0", "1"}:
+                raise ValueError("Reference must contain only 0/1 bits and whitespace.")
+            result = reference_ber(bits, np.fromiter(map(int, text), dtype=np.uint8), offset)
+        except (OSError, ValueError) as exc:
+            QtWidgets.QMessageBox.warning(self, "Reference BER", str(exc))
+            return
+        sigs[row].setdefault("exploitation", {})["reference_ber"] = result
+        self.report_text.setPlainText(json.dumps(self.report, indent=2, default=str))
+        QtWidgets.QMessageBox.information(self, "Reference BER", json.dumps(result, indent=2))
 
     def export_bits(self):
         row = self.track_list.currentRow()

@@ -236,6 +236,60 @@ NTRO_SIH26147_SignalAnalysis/
 
 ## 6. Installation & Quick Start
 
+### Receiver review improvements
+
+The file-analysis path now supplements burst CFAR with linear-power time
+averaging and frequency filters from 2 to 64 bins, using an iteratively masked
+noise floor. It grows frequency support from the averaged spectrum and merges
+overlapping detections. No detection now remains `NO_SIGNAL_DETECTED`; the
+pipeline no longer creates an unconditional fallback track. The thresholds
+are empirical, so a CFAR name does not imply a calibrated false-alarm rate.
+
+Channels are filtered to their detected bandwidth before baud estimation.
+Independent in-band SNR is measured using clean spectrum on both sides with
+other detected bands excluded. That estimate is converted to symbol Es/N0
+for EVM consistency and noise-corrected fourth-cumulant checks. Low-SNR order
+decisions abstain, retaining PSK/QAM family evidence when available. Neural/DSP
+disagreements are explicit in `modulation_decision`. Missing or clipped
+roll-off estimates are null; `carrier_offset_hz` combines coarse and residual
+offsets. Reports flag overlapping tracks sharing a near-identical baud rate
+and detector/post-filter SNR differences exceeding 3 dB. These flags indicate
+possible interference, not proof of it.
+
+Byte previews search all eight offsets, both polarities, and both byte bit
+orders. The chosen alignment and ambiguity are reported; readable text alone
+does not validate a payload. Whole-frame repetition cannot count as a sync
+word. To measure BER against a known bit sequence at an explicit alignment:
+
+```bash
+python main.py capture.cf32 --fs 256000 --reference-bits expected.txt --reference-offset 3 --json
+```
+
+The GUI offers **Compare reference bits…** in the Bit stream tab. Reference
+files contain `0`/`1` text with optional whitespace. BER reports include the
+number of compared bits and whether the reference was fully covered.
+
+Run the reproducible development benchmark and regression cases with:
+
+```bash
+python tools/benchmark_receiver_review.py --trials 20 --output receiver-review.json
+pytest tests/test_feedback_improvements.py -q
+```
+
+The benchmark compares burst CFAR with the supplemented detector and measures
+order decisions with known timing. It records per-SNR confusion matrices,
+abstention, accuracy on decided cases, detection probability, capture-level
+false-alarm probability, Wilson intervals, and a SHA256 commitment to its
+generation specification. Its disjoint `--split holdout` seed range should
+remain unused during tuning; this is not an access-controlled sealed corpus.
+It covers AWGN, not the entire multipath/overlap/real-SDR operating envelope.
+
+These changes do not retrain or recalibrate neural checkpoint weights.
+Successive interference cancellation, deployment-set temperature fitting,
+and validation against new real SDR recordings remain future work. Existing
+blind equalization remains in the receiver. The report's family evidence is
+statistical evidence, not a calibrated confidence probability.
+
 ### 1. Prerequisites
 Ensure Python 3.10+ is installed on your system.
 

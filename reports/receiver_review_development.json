@@ -1,0 +1,494 @@
+{
+  "spec": {
+    "version": 1,
+    "split": "development",
+    "seed_base": 31000,
+    "trials": 5,
+    "mods": [
+      "BPSK",
+      "QPSK",
+      "8PSK",
+      "16QAM",
+      "64QAM"
+    ],
+    "inband_snr_db": [
+      -6,
+      0,
+      4,
+      8,
+      16,
+      25
+    ],
+    "fs": 256000,
+    "sps": 16,
+    "alpha": 0.35,
+    "symbols": 2048
+  },
+  "spec_sha256": "36d9a41ce07a494bdabefc571dea18972c545a8b1c019d8e4d9d955c88645d2f",
+  "scope": "AWGN detector; known-timing symbol order. No end-to-end BER or real-SDR claim.",
+  "bins": [
+    {
+      "snr_db": -6,
+      "captures": 25,
+      "detector_baseline_pd": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "detector_pd": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "noise_capture_pfa": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "baseline_noise_capture_pfa": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "order_accuracy": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "decided_accuracy": {
+        "rate": null,
+        "count": 0,
+        "ci95": null
+      },
+      "baseline_decided_accuracy": {
+        "rate": null,
+        "count": 0,
+        "ci95": null
+      },
+      "abstention_rate": 1.0,
+      "coarse_center_mae_hz": null,
+      "confusion": {
+        "BPSK": {
+          "UNRESOLVED": 5
+        },
+        "QPSK": {
+          "UNRESOLVED": 5
+        },
+        "8PSK": {
+          "UNRESOLVED": 5
+        },
+        "16QAM": {
+          "UNRESOLVED": 5
+        },
+        "64QAM": {
+          "UNRESOLVED": 5
+        }
+      }
+    },
+    {
+      "snr_db": 0,
+      "captures": 25,
+      "detector_baseline_pd": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "detector_pd": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "noise_capture_pfa": {
+        "rate": 0.04,
+        "count": 25,
+        "ci95": [
+          0.007096050386699165,
+          0.19544472405022525
+        ]
+      },
+      "baseline_noise_capture_pfa": {
+        "rate": 0.04,
+        "count": 25,
+        "ci95": [
+          0.007096050386699165,
+          0.19544472405022525
+        ]
+      },
+      "order_accuracy": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "decided_accuracy": {
+        "rate": null,
+        "count": 0,
+        "ci95": null
+      },
+      "baseline_decided_accuracy": {
+        "rate": 0.13043478260869565,
+        "count": 23,
+        "ci95": [
+          0.04537576514344702,
+          0.32127897973018194
+        ]
+      },
+      "abstention_rate": 1.0,
+      "coarse_center_mae_hz": 267.09479040145493,
+      "confusion": {
+        "BPSK": {
+          "UNRESOLVED": 5
+        },
+        "QPSK": {
+          "UNRESOLVED": 5
+        },
+        "8PSK": {
+          "UNRESOLVED": 5
+        },
+        "16QAM": {
+          "UNRESOLVED": 5
+        },
+        "64QAM": {
+          "UNRESOLVED": 5
+        }
+      }
+    },
+    {
+      "snr_db": 4,
+      "captures": 25,
+      "detector_baseline_pd": {
+        "rate": 0.12,
+        "count": 25,
+        "ci95": [
+          0.04166741357068093,
+          0.2995619218337349
+        ]
+      },
+      "detector_pd": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "noise_capture_pfa": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "baseline_noise_capture_pfa": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "order_accuracy": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "decided_accuracy": {
+        "rate": null,
+        "count": 0,
+        "ci95": null
+      },
+      "baseline_decided_accuracy": {
+        "rate": 0.2,
+        "count": 25,
+        "ci95": [
+          0.08860454100652487,
+          0.3913133553653824
+        ]
+      },
+      "abstention_rate": 1.0,
+      "coarse_center_mae_hz": 159.22823497757082,
+      "confusion": {
+        "BPSK": {
+          "UNRESOLVED": 5
+        },
+        "QPSK": {
+          "UNRESOLVED": 5
+        },
+        "8PSK": {
+          "UNRESOLVED": 5
+        },
+        "16QAM": {
+          "UNRESOLVED": 5
+        },
+        "64QAM": {
+          "UNRESOLVED": 5
+        }
+      }
+    },
+    {
+      "snr_db": 8,
+      "captures": 25,
+      "detector_baseline_pd": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "detector_pd": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "noise_capture_pfa": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "baseline_noise_capture_pfa": {
+        "rate": 0.0,
+        "count": 25,
+        "ci95": [
+          0,
+          0.13319649395317873
+        ]
+      },
+      "order_accuracy": {
+        "rate": 0.6,
+        "count": 25,
+        "ci95": [
+          0.40739127785127344,
+          0.7659694233580909
+        ]
+      },
+      "decided_accuracy": {
+        "rate": 1.0,
+        "count": 15,
+        "ci95": [
+          0.7961107336956521,
+          1
+        ]
+      },
+      "baseline_decided_accuracy": {
+        "rate": 0.6,
+        "count": 25,
+        "ci95": [
+          0.40739127785127344,
+          0.7659694233580909
+        ]
+      },
+      "abstention_rate": 0.4,
+      "coarse_center_mae_hz": 59.16799819341017,
+      "confusion": {
+        "BPSK": {
+          "BPSK": 5
+        },
+        "QPSK": {
+          "QPSK": 5
+        },
+        "8PSK": {
+          "8PSK": 5
+        },
+        "16QAM": {
+          "UNRESOLVED": 5
+        },
+        "64QAM": {
+          "UNRESOLVED": 5
+        }
+      }
+    },
+    {
+      "snr_db": 16,
+      "captures": 25,
+      "detector_baseline_pd": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "detector_pd": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "noise_capture_pfa": {
+        "rate": 0.04,
+        "count": 25,
+        "ci95": [
+          0.007096050386699165,
+          0.19544472405022525
+        ]
+      },
+      "baseline_noise_capture_pfa": {
+        "rate": 0.04,
+        "count": 25,
+        "ci95": [
+          0.007096050386699165,
+          0.19544472405022525
+        ]
+      },
+      "order_accuracy": {
+        "rate": 0.96,
+        "count": 25,
+        "ci95": [
+          0.8045552759497747,
+          0.9929039496133008
+        ]
+      },
+      "decided_accuracy": {
+        "rate": 1.0,
+        "count": 24,
+        "ci95": [
+          0.8620194241710247,
+          1
+        ]
+      },
+      "baseline_decided_accuracy": {
+        "rate": 0.96,
+        "count": 25,
+        "ci95": [
+          0.8045552759497747,
+          0.9929039496133008
+        ]
+      },
+      "abstention_rate": 0.040000000000000036,
+      "coarse_center_mae_hz": 60.509748758964996,
+      "confusion": {
+        "BPSK": {
+          "BPSK": 5
+        },
+        "QPSK": {
+          "QPSK": 5
+        },
+        "8PSK": {
+          "8PSK": 5
+        },
+        "16QAM": {
+          "16QAM": 5
+        },
+        "64QAM": {
+          "64QAM": 4,
+          "UNRESOLVED": 1
+        }
+      }
+    },
+    {
+      "snr_db": 25,
+      "captures": 25,
+      "detector_baseline_pd": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "detector_pd": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "noise_capture_pfa": {
+        "rate": 0.04,
+        "count": 25,
+        "ci95": [
+          0.007096050386699165,
+          0.19544472405022525
+        ]
+      },
+      "baseline_noise_capture_pfa": {
+        "rate": 0.04,
+        "count": 25,
+        "ci95": [
+          0.007096050386699165,
+          0.19544472405022525
+        ]
+      },
+      "order_accuracy": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "decided_accuracy": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "baseline_decided_accuracy": {
+        "rate": 1.0,
+        "count": 25,
+        "ci95": [
+          0.8668035060468213,
+          1
+        ]
+      },
+      "abstention_rate": 0.0,
+      "coarse_center_mae_hz": 49.9057993751418,
+      "confusion": {
+        "BPSK": {
+          "BPSK": 5
+        },
+        "QPSK": {
+          "QPSK": 5
+        },
+        "8PSK": {
+          "8PSK": 5
+        },
+        "16QAM": {
+          "16QAM": 5
+        },
+        "64QAM": {
+          "64QAM": 5
+        }
+      }
+    }
+  ]
+}

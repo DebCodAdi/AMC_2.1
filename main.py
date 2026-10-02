@@ -32,10 +32,11 @@ def _fmt_hz(v: float) -> str:
 
 def _print_exploitation(ex: dict) -> None:
     d = ex.get("demodulation", {})
+    alpha = d.get("rolloff")
+    alpha_text = f"{alpha:.2f}" if alpha is not None else "n/a"
     print(f"  Demodulation : {d.get('modulation')} ({d.get('family')})  "
           f"Rs {d.get('symbol_rate_hz', 0):.1f} Bd  "
-          + (f"roll-off {d.get('rolloff', 0):.2f}  EVM {d.get('evm_db', 0):.1f} dB  "
-             f"CFO {d.get('cfo_hz', 0):+.1f} Hz" if d.get("family") == "linear" else
+          + (f"roll-off {alpha_text}  EVM {d.get('evm_db', 0):.1f} dB" if d.get("family") == "linear" else
              f"tones {d.get('fsk', {}).get('n_tones')}  h {d.get('fsk', {}).get('modulation_index', 0):.2f}"))
     if "symbol_rate_per_sample" in d:
         print(f"                 (sample rate unknown: Rs = {d['symbol_rate_per_sample']:.5f} x fs)")
@@ -80,6 +81,10 @@ def _print_exploitation(ex: dict) -> None:
             print(f"    ... {len(dec['frames'])} frames in total (full list in --json / GUI)")
     elif dec.get("preview_text"):
         print(f"  Decoded bytes: {dec['preview_text'][:80]}  (no frame model: raw preview)")
+    if dec.get("byte_alignment"):
+        print(f"  Byte alignment: {dec['byte_alignment']}")
+    if "reference_ber" in ex:
+        print(f"  Reference BER: {ex['reference_ber']}")
     print(f"  Status       : {ex.get('status')}")
     for note in ex.get("notes", []):
         print(f"    note: {note}")
@@ -103,8 +108,18 @@ def main():
                         help="Trained model checkpoint (from signal9.train.trainer) for neural classification")
     parser.add_argument("--json", action="store_true", help="Output full JSON report to stdout")
     parser.add_argument("--save-json", type=str, default=None, help="Save report to JSON file path")
+    parser.add_argument("--reference-bits", type=Path, help="Test mode: text file of 0/1 reference bits")
+    parser.add_argument("--reference-offset", type=int, default=0, help="Explicit decoded-bit offset for BER comparison")
 
     args = parser.parse_args()
+    reference = None
+    if args.reference_bits:
+        import numpy as np
+        text = "".join(args.reference_bits.read_text().split())
+        if not text or set(text) - {"0", "1"} or args.reference_offset < 0:
+            parser.error("Reference must contain 0/1 bits and offset must be nonnegative")
+        reference = np.fromiter(map(int, text), dtype=np.uint8)
+    artifacts = {} if reference is not None else None
 
     engine = Signal9Engine(checkpoint=args.checkpoint)
     if not args.json:
@@ -117,10 +132,19 @@ def main():
             fmt=args.format,
             exploit=not args.no_exploit,
             max_exploit_tracks=args.max_tracks,
+            artifacts=artifacts,
         )
     except Exception as e:
         print(f"[!] Error processing file: {e}", file=sys.stderr)
         sys.exit(1)
+
+    if reference is not None:
+        from signal9.dsp.bit_alignment import reference_ber
+        for track in artifacts.get("tracks", []):
+            bits = track.get("decoded_bits")
+            if bits is not None:
+                sig = results["signals"][track["track_id"] - 1]
+                sig["exploitation"]["reference_ber"] = reference_ber(bits, reference, args.reference_offset)
 
     if args.json:
         print(json.dumps(results, indent=2, default=str))
@@ -157,6 +181,9 @@ def main():
         l1, l2, l3 = cls.get("l1", {}), cls.get("l2", {}), cls.get("l3", {})
 
         print(f"Signal #{tid}: Offset {fc_rel:+.2f} kHz | BW {bw_khz:.1f} kHz | SNR {snr:+.1f} dB")
+        if sig.get("carrier_offset_hz") is not None:
+            print(f"  Total carrier: {sig['carrier_offset_hz']:+.3f} Hz relative to capture centre")
+        print(f"  Decision     : {sig.get('modulation_decision', {})}")
         print(f"  L1 Family    : {l1.get('prediction')} (conf: {l1.get('confidence', 0) * 100:.1f}%) [{l1.get('decision_state')}]")
         print(f"  L2 Modulation: {l2.get('prediction')} (conf: {l2.get('confidence', 0) * 100:.1f}%) [{l2.get('decision_state')}]")
         print(f"  L3 Protocol  : {l3.get('prediction')} (conf: {l3.get('confidence', 0) * 100:.1f}%) [{l3.get('decision_state')}]")

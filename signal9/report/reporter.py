@@ -13,6 +13,7 @@ import numpy as np
 
 from signal9.status import Status
 from signal9.contracts import empty_telemetry
+from signal9.decide.reconcile import reconcile_modulation
 
 
 class Signal9Reporter:
@@ -57,6 +58,19 @@ class Signal9Reporter:
         }
         if exploitation is not None:
             det["exploitation"] = exploitation
+        demod = (exploitation or {}).get("demodulation", {})
+        det["modulation_decision"] = reconcile_modulation(
+            predictions.get("levels", {}).get("l2", {}), demod)
+        detector_snr = track_info.get("detector_snr_db")
+        filtered_snr = track_info.get("post_filter_snr_db")
+        det["snr_measurement"] = {"definition": "in_band_signal_over_noise",
+                                  "detector_db": detector_snr, "post_filter_db": filtered_snr,
+                                  "interference_suspected": bool(detector_snr is not None and filtered_snr is not None
+                                                                and abs(detector_snr - filtered_snr) > 3)}
+        fine = demod.get("cfo_hz")
+        det["carrier_offset_hz"] = (float(track_info.get("center_freq", 0)) + float(fine)
+                                    if fine is not None and demod.get("modulation") != "UNRESOLVED" else None)
+        det["carrier_frequency_hz"] = self.fc + det["carrier_offset_hz"] if det["carrier_offset_hz"] is not None else None
         self.detections.append(det)
         # A detection is already evidence that the detector succeeded.  Until
         # a downstream decoder promotes the result to SUCCESS_CRC_LOCKED (or
@@ -64,6 +78,21 @@ class Signal9Reporter:
         # the existing soft-success state rather than NO_SIGNAL_DETECTED.
         if self._status == Status.NO_SIGNAL_DETECTED.value:
             self._status = Status.DEMOD_NO_CRC.value
+
+    def flag_overlapping_rates(self) -> None:
+        """Flag near-identical clocks only when tracks overlap in time and frequency."""
+        for i, a in enumerate(self.detections):
+            for b in self.detections[i + 1:]:
+                da = a.get("exploitation", {}).get("demodulation", {})
+                db = b.get("exploitation", {}).get("demodulation", {})
+                ra, rb = da.get("symbol_rate_hz", 0), db.get("symbol_rate_hz", 0)
+                time_overlap = min(a["t_end_sec"], b["t_end_sec"]) > max(a["t_start_sec"], b["t_start_sec"])
+                freq_overlap = abs(a["freq_center_relative_hz"] - b["freq_center_relative_hz"]) < (a["bandwidth_hz"] + b["bandwidth_hz"]) / 2
+                if ra > 0 and rb > 0 and abs(ra - rb) / max(ra, rb) < 0.01 and time_overlap and freq_overlap:
+                    for track, other in ((a, b), (b, a)):
+                        ids = track.setdefault("duplicate_rate_track_ids", [])
+                        if other["track_id"] not in ids:
+                            ids.append(other["track_id"])
 
     # ── Telemetry setters ─────────────────────────────────────────────────
 

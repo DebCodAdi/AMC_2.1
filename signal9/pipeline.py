@@ -18,6 +18,7 @@ from .detect.spectrogram import log_spectrogram
 from .detect.whiten import whiten_spectrogram
 from .detect.temporal_baseline import TemporalBaseline
 from .detect.cfar import detect_cfar
+from .detect.multiscale import detect_multiscale, inband_snr
 from .detect.tracker import track_detections
 from .detect.yolo_adapter import YoloDetector
 from .detect.merge import merge_boxes
@@ -241,23 +242,14 @@ class Signal9Engine:
 
             # YOLO & CFAR fusion
             cfar_boxes = detect_cfar(Pw_db, f, t, thr_db=6.0)
+            averaged_boxes = detect_multiscale(P_db, f, t)
+            if audio_input:
+                averaged_boxes = [b for b in averaged_boxes if b["f_lo"] > 0]
+            cfar_boxes.extend(averaged_boxes)
             yolo_boxes = self.yolo.detect(P_db, f, t)
 
             merged_boxes = merge_boxes(cfar_boxes, yolo_boxes)
-            tracks = track_detections(merged_boxes)
-
-            if not tracks:
-                bw, flo, fhi, snr = occupied_bandwidth(iq_wb, iq_fs)
-                tracks = [{
-                    "f_lo": flo,
-                    "f_hi": fhi,
-                    "t_lo": float(t[0]) if len(t) > 0 else 0.0,
-                    "t_hi": float(t[-1]) if len(t) > 0 else len(iq_wb) / iq_fs,
-                    "peak_db": float(np.max(Pw_db)),
-                    "center_freq": 0.5 * (flo + fhi),
-                    "bandwidth": float(bw),
-                    "duration": len(iq_wb) / iq_fs,
-                }]
+            tracks = track_detections(merged_boxes, freq_tol_hz=0.0)
 
             # Sort tracks by prominence (energy: peak_db * bandwidth) so primary emitter is always Track 1
             tracks = sorted(tracks, key=lambda tr: float(tr.get("peak_db", 0.0)) * float(tr.get("bandwidth", 1.0)), reverse=True)
@@ -277,6 +269,11 @@ class Signal9Engine:
                     continue
 
                 bw_est, _, _, snr_est = occupied_bandwidth(ch_signal, ch_fs)
+                detector_snr = inband_snr(P_db, f, t, tr, tracks)
+                tr["detector_snr_db"] = detector_snr
+                tr["post_filter_snr_db"] = None
+                if detector_snr is not None:
+                    snr_est = detector_snr
 
                 if self.classifier is not None:
                     pred_dict = self._classify_trained(ch_signal, snr_est, ch_fs=float(ch_fs))
@@ -291,7 +288,8 @@ class Signal9Engine:
                 demod_symbols = None
                 decoded_bits = None
                 if (chain is not None and n_exploited < max_exploit_tracks
-                        and float(snr_est) >= min_exploit_snr_db):
+                        and float(snr_est) >= min_exploit_snr_db
+                        and pred_dict.get("levels", {}).get("l2", {}).get("prediction") != "NOISE"):
                     l2 = pred_dict.get("levels", {}).get("l2", {})
                     # Only a confident classification is passed on as a hint;
                     # an uncertain (or untrained) network must not steer the
@@ -299,8 +297,13 @@ class Signal9Engine:
                     hint = l2.get("prediction") if l2.get("decision_state") == "DECISION" else None
                     try:
                         ex = chain.run(ch_signal, float(ch_fs),
-                                       fs_source=meta.sample_rate_source, mod_hint=hint)
+                                       fs_source=meta.sample_rate_source, mod_hint=hint,
+                                       inband_snr_db=detector_snr, bandwidth_hz=tr["bandwidth"])
                         exploitation = ex.to_dict()
+                        if ex.demod.modulation != "UNRESOLVED" and ex.demod.family == "linear" and ex.demod.symbol_rate_hz > 0:
+                            from .dsp.snr_estimate import estimate_snr_m2m4
+                            symbol_snr = estimate_snr_m2m4(ex.demod.symbols, ex.demod.modulation)
+                            tr["post_filter_snr_db"] = float(symbol_snr - 10 * np.log10(tr["bandwidth"] / ex.demod.symbol_rate_hz))
                         demod_symbols = getattr(ex.demod, "symbols", None)
                         decoded_bits = getattr(ex, "decoded_bits", None)
                         if fs_assumed:
@@ -330,6 +333,8 @@ class Signal9Engine:
 
                 reporter.add_detection(tr, pred_dict, exploitation=exploitation)
 
+        reporter.flag_overlapping_rates()
+
         if usable_chunks == 0:
             reporter.set_status(Status.INSUFFICIENT_SAMPLES)
         return reporter.to_dict()
@@ -337,6 +342,8 @@ class Signal9Engine:
     def _classify_trained(self, iq: np.ndarray, snr_est: float, ch_fs: float | None = None) -> dict[str, Any]:
         r = self.classifier.predict(iq, fs=ch_fs)
         state = "DECISION" if (r["confidence"] >= 0.60 and snr_est >= 3.0) else             ("NO_DECISION" if snr_est < 3.0 else "UNKNOWN")
+        if r.get("modulation") in ("UNKNOWN", "NOISE") or r.get("open_set", {}).get("rejected"):
+            state = "UNKNOWN"
         return {
             "track_snr_db": float(snr_est),
             "levels": {

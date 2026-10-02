@@ -187,6 +187,8 @@ def estimate_rolloff(x: np.ndarray,
         if den <= 0:
             continue
         m = float(np.trapezoid(ff ** 2 * pp, ff) / den) / ((rs / 2.0) ** 2)
+        if not np.isfinite(m) or m < _MOMENT_GRID[0] or m > _MOMENT_GRID[-1]:
+            return 0.35, 0.0
         sides.append(float(np.interp(m, _MOMENT_GRID, _ALPHA_GRID)))
 
     if not sides:

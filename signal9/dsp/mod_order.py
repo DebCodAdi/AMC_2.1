@@ -125,7 +125,8 @@ def residual_kurtosis(symbols: np.ndarray, mod_type: str) -> float:
 
 
 def score_modulations(symbols: np.ndarray,
-                      candidates: tuple[str, ...] = DEFAULT_CANDIDATES) -> list[dict]:
+                      candidates: tuple[str, ...] = DEFAULT_CANDIDATES,
+                      snr_db: float | None = None) -> list[dict]:
     """Score every candidate constellation, one record per hypothesis.
 
     Each record carries ``mod``, ``evm_db``, ``usage``, ``residual_kurtosis``,
@@ -137,6 +138,7 @@ def score_modulations(symbols: np.ndarray,
     if symbols.size < 16:
         return out
     angles = np.linspace(0, 2.0 * np.pi, 16, endpoint=False)
+    cumulants = corrected_cumulants(symbols, snr_db)
     for mod in candidates:
         try:
             const = get_constellation(mod)
@@ -161,39 +163,78 @@ def score_modulations(symbols: np.ndarray,
         usage_thresh = min(_USAGE_THRESHOLD, 0.85 * max_possible_usage)
 
         reject = None
-        if e > _MIN_EVM_DB:
+        # SNR must be independent of nearest-grid EVM.  Correct for the
+        # received-power normalization used by evm_db at low SNR.
+        expected_evm = (-10.0 * np.logaddexp(0.0, float(snr_db) * np.log(10) / 10)
+                        / np.log(10)) if snr_db is not None and np.isfinite(snr_db) else None
+        if not np.isfinite(e):
+            reject = "nonfinite"
+        elif expected_evm is not None and e < expected_evm - 3.0:
+            reject = "evm_snr_inconsistent"
+        elif e > _MIN_EVM_DB:
             reject = "evm"           # under-ordered: constellation never opened
         elif u < usage_thresh:
             reject = "usage"         # over-ordered: most points never used
         elif k < _MIN_RESIDUAL_KURTOSIS:
             reject = "residual"      # over-ordered: residual is a grid offset
+        if reject is None and cumulants is not None:
+            reference_c42 = {"BPSK": -2.0, "QPSK": -1.0, "8PSK": -1.0,
+                             "16QAM": -0.68, "64QAM": -0.619}.get(mod)
+            if reference_c42 is not None and abs(cumulants["c42"] - reference_c42) > 0.25:
+                reject = "cumulant_disagreement"
         out.append({
             "mod": mod,
             "evm_db": round(e, 2),
             "usage": round(u, 3),
             "residual_kurtosis": round(k, 3),
             "best_phase_rad": float(best_angle),
+            "expected_evm_db": float(expected_evm) if expected_evm is not None else None,
+            "noise_corrected_cumulants": cumulants,
             "plausible": reject is None,
             "rejected_by": reject,
         })
     return out
 
 
+def corrected_cumulants(symbols: np.ndarray, snr_db: float | None) -> dict | None:
+    """C40/C42 normalized by signal power squared using independent Es/N0.
+
+    These are supporting statistics, not calibrated class probabilities.
+    Gaussian noise has zero fourth cumulant but changes the normalization.
+    """
+    if snr_db is None or not np.isfinite(snr_db) or snr_db < 0:
+        return None
+    y = _normalised(symbols)
+    if y is None or len(y) < 512:
+        return None
+    y = y - np.mean(y)
+    m2 = float(np.mean(abs(y) ** 2))
+    m20 = np.mean(y ** 2)
+    signal_fraction = 1 / (1 + 10 ** (-snr_db / 10))
+    norm = (m2 * signal_fraction) ** 2
+    return {"c40_abs": float(abs(np.mean(y ** 4) - 3 * m20 ** 2) / norm),
+            "c42": float((np.mean(abs(y) ** 4) - abs(m20) ** 2 - 2 * m2 ** 2) / norm)}
+
+
 def select_modulation(symbols: np.ndarray,
                       candidates: tuple[str, ...] = DEFAULT_CANDIDATES,
-                      hint: str | None = None) -> dict:
+                      hint: str | None = None,
+                      snr_db: float | None = None,
+                      timing_lock: float | None = None) -> dict:
     """Pick the constellation the symbol cloud actually came from.
 
-    ``hint`` (typically the neural classifier's label) only breaks ties between
-    hypotheses that are already plausible on the measurements; it can never
-    promote one the usage, EVM or residual test rejected.  That ordering keeps a
-    mis-trained or out-of-distribution classifier from overriding physics.
+    ``hint`` is retained for API compatibility. Measured scores choose the
+    simplest surviving order; neural evidence is reconciled separately.
+    ``snr_db`` is independent symbol Es/N0, never nearest-grid EVM-derived SNR.
 
     Returns a dict with ``modulation`` (``"UNRESOLVED"`` when nothing was
     plausible), ``evm_db``, ``ambiguous``, ``runner_up`` and the full
     ``scores`` table.
     """
-    scores = score_modulations(symbols, candidates)
+    if timing_lock is not None and (not np.isfinite(timing_lock) or timing_lock < 0.5):
+        return {"modulation": "UNRESOLVED", "evm_db": 0.0, "ambiguous": False,
+                "runner_up": None, "scores": [], "reason": "timing_not_locked"}
+    scores = score_modulations(symbols, candidates, snr_db=snr_db)
     # A cloud with Gaussian statistics is noise, not a constellation.  Every
     # PSK/QAM cloud has E|y|^4/(E|y|^2)^2 <= 1.38 without noise (1.0 for PSK,
     # 1.32 for 16QAM, 1.38 for 64QAM) and only approaches the Gaussian value 2
@@ -208,23 +249,29 @@ def select_modulation(symbols: np.ndarray,
                 "runner_up": None, "scores": scores,
                 "reason": f"symbol cloud is Gaussian (kurtosis {cloud_kurtosis:.2f}): noise, not a constellation"}
     plausible = [s for s in scores if s["plausible"]]
+    cumulants = corrected_cumulants(symbols, snr_db)
+    family = None
+    if cumulants is not None:
+        c42 = cumulants["c42"]
+        if -2.3 < c42 < -0.85:
+            family = "PSK"
+        elif -0.8 < c42 < -0.4:
+            family = "QAM"
+    # At low SNR overlapping grids cannot establish an exact order reliably.
+    # Retain family evidence, and stop bit decoding instead of forcing a label.
+    if snr_db is not None and (snr_db < 6 or (family == "QAM" and snr_db < 12)):
+        return {"modulation": "UNRESOLVED", "evm_db": 0.0, "ambiguous": True,
+                "runner_up": None, "scores": scores, "modulation_family": family,
+                "reason": "insufficient_snr_for_order"}
     if not plausible:
         return {"modulation": "UNRESOLVED", "evm_db": 0.0, "ambiguous": False,
                 "runner_up": None, "scores": scores}
 
     best_fit = min(s["evm_db"] for s in plausible)
     # Parsimony: everything fitting within tolerance of the best is "as good",
-    # so take the lowest-order member of that set.  `candidates` is ordered
-    # smallest-first, so the first match is the simplest.
+    # so take the lowest-order member of that set, regardless of input order.
     within = [s for s in plausible if s["evm_db"] <= best_fit + _PARSIMONY_TOL_DB]
-    chosen = within[0]
-
-    if hint:
-        h = hint.upper().replace("-", "")
-        for s in within:
-            if s["mod"] == h:
-                chosen = s
-                break
+    chosen = min(within, key=lambda s: len(get_constellation(s["mod"])))
 
     others = [s for s in within if s["mod"] != chosen["mod"]]
     return {

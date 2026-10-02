@@ -112,7 +112,9 @@ def find_sync_pattern(bits: np.ndarray,
                 best_len, best_start = cur, start
             cur = 0
 
-    if best_len < min_len:
+    # A repeated payload can make the entire frame constant.  That is period
+    # evidence, not an independently identifiable sync word.
+    if best_len < min_len or best_len > period // 4:
         return None
 
     ln, st = best_len, best_start
